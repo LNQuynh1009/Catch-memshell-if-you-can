@@ -59,13 +59,43 @@ Outputs:
 | HIGH | Likely webshell — investigate |
 | MEDIUM | Suspicious — queue for review |
 | BENIGN | No threat detected |
-| ERROR | Could not disassemble (inner class, truncated bytecode) |
 
 Detection uses two paths:
 - **fileless** (memory webshell): injection interface detected → rules lead
 - **file_based** (JSP/servlet webshell): no interface → ML model (ResNet50) leads
 
+## Detection performance
+
+Evaluated on 6,452 `.class` files (958 webshells, 5,494 benign):
+
+| Metric | Score |
+|---|---|
+| Accuracy | 96.3% |
+| Recall (webshell) | 99.9% |
+| Precision | 80.3% |
+| False positive rate | 4.3% |
+| F1 | 89.0% |
+
+Per category:
+
+| Source | Recall | FPR |
+|---|---|---|
+| `webshell_file` | 100% | 0% |
+| `webshell_fileless` | 98.8% | 0% |
+| `benign` | — | 4.7% |
+| `benign_test` | — | 0.4% |
+
+Cross-validation on file-based webshells (3 runs, 80/20 split):
+
+| Metric | Mean | Std |
+|---|---|---|
+| Accuracy | 99.25% | ±0.59% |
+| Precision | 99.25% | ±0.72% |
+| Recall | 98.98% | ±0.68% |
+| F1 | 99.11% | ±0.70% |
+| AUC-ROC | 99.88% | ±0.14% |
+
 ## Performance
 
-~3 files/sec on CPU. 10,000 files ≈ 55 min.
+~2–3 files/sec on CPU. 10,000 files ≈ 55–80 min.
 On a GPU machine PyTorch auto-detects CUDA — expect 10–20× faster.

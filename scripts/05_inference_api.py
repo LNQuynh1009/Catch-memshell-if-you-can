@@ -88,7 +88,7 @@ REFLECT_OPS = {"invokevirtual","invokedynamic"}
 # Feature extraction — shared disassembly step used by both model backends
 # ---------------------------------------------------------------------------
 
-def disassemble(class_path: Path) -> tuple[list[str] | None, str]:
+def disassemble(class_path: Path) -> tuple[list[str], str] | tuple[None, str]:
     try:
         r = subprocess.run(
             ["javap", "-c", "-p", "-verbose", str(class_path)],
@@ -101,7 +101,7 @@ def disassemble(class_path: Path) -> tuple[list[str] | None, str]:
             m = _OPCODE_RE.match(line)
             if m:
                 ops.append(OPCODE_NORM.get(m.group(1), m.group(1)))
-        return (ops if ops else None), r.stdout
+        return ops, r.stdout
     except Exception:
         return None, ""
 
